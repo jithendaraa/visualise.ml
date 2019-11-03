@@ -13,7 +13,7 @@ Visualise.ml consists of a set of projects which involves visualising Machine/De
 
 DWoC is a winter long program organised by Delta Force, the coding club of NIT Trichy. With an aim to support and improve the culture of open source software around us, this serves as a platform for young student developers (or even starters) to hone their technical skills by taking up projects of their interests. We hope this encourages collabrative experiences and allows students from all backgrounds to contribute to quality technical projects from diverse fields.
 
-If you're here for a <a href="https://dwoc.io">Delta Winter of Code</a> project, head over to the <a href="https://github.com/jithendaraa/visualise.ml/wiki">Contributor's Guide</a> in the Wiki.
+If you're here for a <a href="https://dwoc.io">Delta Winter of Code</a> project, head over to the <a href="https://github.com/jithendaraa/visualise.ml/wiki/DWoC-Contributor's-Guide">Contributor's Guide</a> in the Wiki.
 
 
 
