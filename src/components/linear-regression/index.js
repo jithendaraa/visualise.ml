@@ -5,20 +5,23 @@ import {
   VictoryTheme,
   VictoryLine
 } from "victory";
+import RegressionStatistics from "../regression-statistics/index";
 
 const data_points = [
-  { x: 1, y: 2 },
-  { x: 7, y: 3 },
-  { x: 3, y: 3 },
-  { x: 7, y: 3 }
+  { x: 1, y: 1 },
+  { x: 2, y: 2 },
+  { x: 3, y: 1 },
+  { x: 4, y: 3 },
+  { x: 5, y: 2 }
 ];
 
 export default class LinearRegression extends React.Component {
   constructor() {
     super();
+    this.intercept = 0;
+    this.iterations = 0;
     this.state = {
       m: 0.64,
-      intercept: 0,
       learningRate: 0.001,
       lineDataPoints: []
     };
@@ -27,28 +30,37 @@ export default class LinearRegression extends React.Component {
     let count = 0;
     let evaluation = 0;
     let step_size = 0;
-    let newIntercept = this.state.intercept;
+    let newIntercept = this.intercept;
 
     do {
       console.log("inside do...");
       data_points.forEach(coordinate => {
         evaluation +=
-          -2 *
-          (coordinate.y - (this.state.m * coordinate.x + this.state.intercept));
+          -2 * (coordinate.y - (this.state.m * coordinate.x + this.intercept));
       });
       step_size = evaluation * this.state.learningRate;
-      newIntercept = this.state.intercept - step_size;
+      newIntercept = this.intercept - step_size;
       console.log("new intercept", newIntercept);
+      console.log("old interncept", this.intercept);
+      console.log("abs difference", Math.abs(newIntercept - this.intercept));
       count++;
-      this.setState(
-        {
-          intercept: newIntercept
-        },
-        () => {
-          this.drawLine();
-        }
-      );
-    } while (count !== 100);
+      this.iterations = count;
+      // this.setState(
+      //   {
+      //     intercept: newIntercept
+      //   },
+      //   () => {
+      //     console.log('new intercept state after updTE', this.intercept);
+      //     this.drawLine();
+      //   }
+      // );
+      if (Math.abs(newIntercept - this.intercept) <= 0.0001) {
+        console.log("breaking...");
+        break;
+      }
+      this.intercept = newIntercept;
+      this.drawLine();
+    } while (true);
   };
 
   drawLine = () => {
@@ -56,7 +68,7 @@ export default class LinearRegression extends React.Component {
     for (let i = 0; i < 20; i++) {
       datapoints.push({
         x: i,
-        y: this.state.m * i + this.state.intercept
+        y: this.state.m * i + this.intercept
       });
     }
     this.setState({
@@ -65,8 +77,7 @@ export default class LinearRegression extends React.Component {
   };
 
   render() {
-    console.log("slope:-", this.state.m);
-    console.log("intercept", this.state.intercept);
+    console.log(`equation:- y=${this.state.m}x + ${this.intercept}`);
     return (
       <div style={{ width: 400, height: 400 }}>
         <h1>Linear regression </h1>
@@ -97,6 +108,11 @@ export default class LinearRegression extends React.Component {
             apply LinearRegression
           </button>
         </div>
+        <RegressionStatistics
+          iterations={this.iterations}
+          slope={this.state.m}
+          intercept={this.intercept}
+        />
       </div>
     );
   }
