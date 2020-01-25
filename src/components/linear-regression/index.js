@@ -89,15 +89,28 @@ export default class LinearRegression extends React.Component {
             // domain={{x: [0, 20], y: [0, 20]}}
             theme={VictoryTheme.material}
             animate={{ duration: 2000 }}
+            events={[
+              {
+                target: "parent",
+                childName: "scatter",
+                eventHandlers: {
+                  onClick: (evt, clickedProps) => {
+                    console.log("evt", evt);
+                    console.log("clickedProps", clickedProps);
+                  }
+                }
+              }
+            ]}
           >
             <VictoryScatter
               style={{
                 data: { stroke: "#c43a31" },
                 parent: { border: "1px solid #ccc" }
               }}
+              name="scatter"
               data={data_points}
-              width={70}
-              height={70}
+              width={50}
+              height={50}
             />
             <VictoryLine
               style={{
@@ -107,7 +120,10 @@ export default class LinearRegression extends React.Component {
               data={this.state.lineDataPoints}
             />
           </VictoryChart>
-          <button onClick={this.applyLinearRegression}>
+          <button
+            onClick={this.applyLinearRegression}
+            className="btn btn-success"
+          >
             apply LinearRegression
           </button>
         </div>

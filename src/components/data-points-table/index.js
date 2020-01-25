@@ -6,12 +6,12 @@ const DataPointsTable = ({ datapoints }) => {
     <div style={{ width: "650px" }}>
       <h1>Regression Statistics </h1>
       <div />
-      <table style={{ border: "1px solid black" }} border="1">
-        <thead>
+      <table class="table">
+        <thead class="thead-dark">
           <tr>
-            <th>SNO</th>
-            <th>X</th>
-            <th>Y</th>
+            <th scope="col">SNO</th>
+            <th scope="col">X coordinate</th>
+            <th scope="col">Y coordinate</th>
           </tr>
         </thead>
         <tbody>
