@@ -84,7 +84,13 @@ export default class LinearRegression extends React.Component {
       <div style={{ width: 400, height: 400 }} className="regression-wrapper">
         <div>
           <h1>Linear regression </h1>
-
+          <input
+            type="number"
+            placeholder="Enter the learning rate for the algorithm"
+            className="input input-control"
+            value={this.state.learningRate}
+            onChange={e => this.setState({ learningRate: e.target.value })}
+          />
           <VictoryChart
             // domain={{x: [0, 20], y: [0, 20]}}
             theme={VictoryTheme.material}
