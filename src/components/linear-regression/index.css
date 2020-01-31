@@ -1,4 +1,10 @@
+.table-responsive {
+  max-height: 600px;
+  width: 100%;
+}
+
 .regression-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  display: grid;
+  grid-template-columns: 1fr 0.5fr 1fr;
+  grid-gap: 0px 25px;
 }

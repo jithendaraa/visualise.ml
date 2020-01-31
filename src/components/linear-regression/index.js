@@ -49,7 +49,7 @@ export default class LinearRegression extends React.Component {
       newIntercept = this.intercept - step_size;
       console.log("new intercept", newIntercept);
       console.log("old interncept", this.intercept);
-      console.log("abs difference", Math.abs(newIntercept - this.intercept));
+      console.log("abs difference", newIntercept - this.intercept);
       count++;
       this.iterations = count;
       // this.setState(
@@ -61,18 +61,18 @@ export default class LinearRegression extends React.Component {
       //     this.drawLine();
       //   }
       // );
-      if (Math.abs(newIntercept - this.intercept) <= 0.0001) {
-        console.log("breaking...");
-        break;
-      }
+      // if (newIntercept - this.intercept >= 0) {
+      //   console.log("breaking...");
+      //   break;
+      // }
       this.intercept = newIntercept;
       this.drawLine();
-    } while (true);
+    } while (count !== 200);
   };
 
   drawLine = () => {
     let datapoints = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       datapoints.push({
         x: i,
         y: this.state.m * i + this.intercept
@@ -95,13 +95,13 @@ export default class LinearRegression extends React.Component {
   };
 
   generateRandomPoints = () => {
-    let count = 100;
+    let count = 150;
     let noise = 0.3;
-    let theta = (Math.tanh(this.state.m) * 180) / Math.PI;
+    let theta = Math.tanh(this.state.m);
     let perpendicularIntercept = 0;
     let randomPointsMap = [];
     let noiseMap = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < count; i++) {
       let randomNumber = this.getGaussianRandomNumber();
       randomPointsMap.push({
         x: randomNumber,
@@ -110,7 +110,7 @@ export default class LinearRegression extends React.Component {
     }
     console.log(randomPointsMap);
     // mapping for noise
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < count; i++) {
       noiseMap.push(this.getGaussianRandomNumber() / (noise * noise));
     }
     console.log("noiseMap", noiseMap);
@@ -120,21 +120,14 @@ export default class LinearRegression extends React.Component {
       randomPointsMap[0].y + randomPointsMap[0].x / this.state.m;
 
     // logic for geneeration of random data points by solving equation of circle and perpendicular line
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < count; i++) {
       let point1 = {
-        x:
-          randomPointsMap[i].x -
-          noiseMap[i] * Math.sin((theta * Math.PI) / 180),
-        y:
-          randomPointsMap[i].y + noiseMap[i] * Math.cos((theta * Math.PI) / 180)
+        x: randomPointsMap[i].x - noiseMap[i] * Math.sin(theta),
+        y: randomPointsMap[i].y + noiseMap[i] * Math.cos(theta)
       };
       let point2 = {
-        x:
-          randomPointsMap[i].x +
-          noiseMap[i] * Math.sin((theta * Math.PI) / 180),
-        y: Math.abs(
-          randomPointsMap[i].y - noiseMap[i] * Math.cos((theta * Math.PI) / 180)
-        )
+        x: randomPointsMap[i].x + noiseMap[i] * Math.sin(theta),
+        y: Math.abs(randomPointsMap[i].y - noiseMap[i] * Math.cos(theta))
       };
 
       if (noiseMap[i] < 0) {
@@ -151,67 +144,69 @@ export default class LinearRegression extends React.Component {
   render() {
     console.log(`equation:- y=${this.state.m}x + ${this.intercept}`);
     return (
-      <div style={{ width: 400, height: 400 }} className="regression-wrapper">
-        <div>
-          <h1>Linear regression </h1>
-          <input
-            type="number"
-            placeholder="Enter the learning rate for the algorithm"
-            className="input input-control"
-            value={this.state.learningRate}
-            onChange={e => this.setState({ learningRate: e.target.value })}
-          />
-          <VictoryChart
-            // domain={{x: [0, 20], y: [0, 20]}}
-            theme={VictoryTheme.material}
-            animate={{ duration: 2000 }}
-            events={[
-              {
-                target: "parent",
-                childName: "scatter",
-                eventHandlers: {
-                  onClick: (evt, clickedProps) => {
-                    console.log("evt", evt);
-                    console.log("clickedProps", clickedProps);
+      <div>
+        <h1>Linear regression </h1>
+        <div className="regression-wrapper">
+          <div>
+            <input
+              type="number"
+              placeholder="Enter the learning rate for the algorithm"
+              className="input input-control"
+              value={this.state.learningRate}
+              onChange={e => this.setState({ learningRate: e.target.value })}
+            />
+            <VictoryChart
+              // domain={{x: [0, 20], y: [0, 20]}}
+              theme={VictoryTheme.material}
+              animate={{ duration: 2000 }}
+              events={[
+                {
+                  target: "parent",
+                  childName: "scatter",
+                  eventHandlers: {
+                    onClick: (evt, clickedProps) => {
+                      console.log("evt", evt);
+                      console.log("clickedProps", clickedProps);
+                    }
                   }
                 }
-              }
-            ]}
-          >
-            <VictoryScatter
-              style={{
-                data: { stroke: "#c43a31" },
-                parent: { border: "1px solid #ccc" }
-              }}
-              name="scatter"
-              data={this.state.dataPoints}
-              width={50}
-              height={50}
+              ]}
+            >
+              <VictoryScatter
+                style={{
+                  data: { stroke: "#c43a31" },
+                  parent: { border: "1px solid #ccc" }
+                }}
+                name="scatter"
+                data={this.state.dataPoints}
+                width={50}
+                height={50}
+              />
+              <VictoryLine
+                style={{
+                  data: { stroke: "#c43a31" },
+                  parent: { border: "1px solid #ccc" }
+                }}
+                data={this.state.lineDataPoints}
+              />
+            </VictoryChart>
+            <button
+              onClick={this.applyLinearRegression}
+              className="btn btn-success"
+            >
+              apply LinearRegression
+            </button>
+          </div>
+          <div>
+            <DataPointsTable datapoints={this.state.dataPoints} />
+          </div>
+          <div>
+            <RegressionStatistics
+              iterations={this.iterations}
+              slope={this.state.m}
+              intercept={this.intercept}
             />
-            <VictoryLine
-              style={{
-                data: { stroke: "#c43a31" },
-                parent: { border: "1px solid #ccc" }
-              }}
-              data={this.state.lineDataPoints}
-            />
-          </VictoryChart>
-          <button
-            onClick={this.applyLinearRegression}
-            className="btn btn-success"
-          >
-            apply LinearRegression
-          </button>
-        </div>
-        <div>
-          <DataPointsTable datapoints={[]} />
-        </div>
-        <div>
-          <RegressionStatistics
-            iterations={this.iterations}
-            slope={this.state.m}
-            intercept={this.intercept}
-          />
+          </div>
         </div>
       </div>
     );
