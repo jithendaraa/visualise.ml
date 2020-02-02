@@ -8,6 +8,7 @@ import {
 import RegressionStatistics from "../regression-statistics/index";
 import DataPointsTable from "../data-points-table/index";
 import "./index.css";
+import InputParameter from "../input-parameter";
 
 // const data_points = [
 //   { x: 1, y: 1 },
@@ -26,7 +27,9 @@ export default class LinearRegression extends React.Component {
       m: 1,
       learningRate: 0.001,
       lineDataPoints: [],
-      dataPoints: []
+      dataPoints: [],
+      noise: 0.3,
+      noOfdataPoints: 150
     };
   }
 
@@ -95,13 +98,15 @@ export default class LinearRegression extends React.Component {
   };
 
   generateRandomPoints = () => {
-    let count = 150;
-    let noise = 0.3;
+    console.log(
+      "random points to be generated now is",
+      this.state.noOfdataPoints
+    );
     let theta = Math.tanh(this.state.m);
     let perpendicularIntercept = 0;
     let randomPointsMap = [];
     let noiseMap = [];
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < this.state.noOfdataPoints; i++) {
       let randomNumber = this.getGaussianRandomNumber();
       randomPointsMap.push({
         x: randomNumber,
@@ -110,8 +115,10 @@ export default class LinearRegression extends React.Component {
     }
     console.log(randomPointsMap);
     // mapping for noise
-    for (let i = 0; i < count; i++) {
-      noiseMap.push(this.getGaussianRandomNumber() / (noise * noise));
+    for (let i = 0; i < this.state.noOfdataPoints; i++) {
+      noiseMap.push(
+        this.getGaussianRandomNumber() / (this.state.noise * this.state.noise)
+      );
     }
     console.log("noiseMap", noiseMap);
 
@@ -119,8 +126,8 @@ export default class LinearRegression extends React.Component {
     perpendicularIntercept =
       randomPointsMap[0].y + randomPointsMap[0].x / this.state.m;
 
-    // logic for geneeration of random data points by solving equation of circle and perpendicular line
-    for (let i = 0; i < count; i++) {
+    // logic for generation of random data points by solving equation of circle and perpendicular line
+    for (let i = 0; i < this.state.noOfdataPoints; i++) {
       let point1 = {
         x: randomPointsMap[i].x - noiseMap[i] * Math.sin(theta),
         y: randomPointsMap[i].y + noiseMap[i] * Math.cos(theta)
@@ -139,6 +146,7 @@ export default class LinearRegression extends React.Component {
     this.setState({
       dataPoints: this.state.dataPoints
     });
+    console.log("noOfDataPoints finally", this.state.dataPoints.length);
   };
 
   render() {
@@ -148,13 +156,6 @@ export default class LinearRegression extends React.Component {
         <h1>Linear regression </h1>
         <div className="regression-wrapper">
           <div>
-            <input
-              type="number"
-              placeholder="Enter the learning rate for the algorithm"
-              className="input input-control"
-              value={this.state.learningRate}
-              onChange={e => this.setState({ learningRate: e.target.value })}
-            />
             <VictoryChart
               // domain={{x: [0, 20], y: [0, 20]}}
               theme={VictoryTheme.material}
@@ -196,6 +197,16 @@ export default class LinearRegression extends React.Component {
             >
               apply LinearRegression
             </button>
+            <button
+              onClick={() => {
+                this.setState({ dataPoints: [] }, () => {
+                  this.generateRandomPoints();
+                });
+              }}
+              className="btn btn-warning ml-2"
+            >
+              Generate Points
+            </button>
           </div>
           <div>
             <DataPointsTable datapoints={this.state.dataPoints} />
@@ -205,6 +216,20 @@ export default class LinearRegression extends React.Component {
               iterations={this.iterations}
               slope={this.state.m}
               intercept={this.intercept}
+            />
+            <InputParameter
+              noise={this.state.noise}
+              dataPoints={this.state.dataPoints}
+              noOfDataPoints={this.state.noOfdataPoints}
+              learningRate={this.state.learningRate}
+              handlers={{
+                onNoiseChange: newNoise => {
+                  this.setState({ noise: newNoise });
+                },
+                onLearningRateChange: newLearningRate => {
+                  this.setState({ learningRate: newLearningRate });
+                }
+              }}
             />
           </div>
         </div>
