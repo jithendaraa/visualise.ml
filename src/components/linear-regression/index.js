@@ -9,6 +9,7 @@ import RegressionStatistics from "../regression-statistics/index";
 import DataPointsTable from "../data-points-table/index";
 import "./index.css";
 
+
 const data_points = [
   { x: 1, y: 1 },
   { x: 2, y: 2 },
@@ -25,8 +26,13 @@ export default class LinearRegression extends React.Component {
     this.state = {
       m: 0.64,
       learningRate: 0.001,
-      lineDataPoints: []
+      lineDataPoints: [],
+      dataPoints: []
     };
+  }
+
+  componentDidMount() {
+    this.generateRandomPoints();
   }
   applyLinearRegression = () => {
     let count = 0;
@@ -36,7 +42,7 @@ export default class LinearRegression extends React.Component {
 
     do {
       console.log("inside do...");
-      data_points.forEach(coordinate => {
+      this.state.dataPoints.forEach(coordinate => {
         evaluation +=
           -2 * (coordinate.y - (this.state.m * coordinate.x + this.intercept));
       });
@@ -47,15 +53,6 @@ export default class LinearRegression extends React.Component {
       console.log("abs difference", Math.abs(newIntercept - this.intercept));
       count++;
       this.iterations = count;
-      // this.setState(
-      //   {
-      //     intercept: newIntercept
-      //   },
-      //   () => {
-      //     console.log('new intercept state after updTE', this.intercept);
-      //     this.drawLine();
-      //   }
-      // );
       if (Math.abs(newIntercept - this.intercept) <= 0.0001) {
         console.log("breaking...");
         break;
@@ -75,6 +72,71 @@ export default class LinearRegression extends React.Component {
     }
     this.setState({
       lineDataPoints: datapoints
+    });
+  };
+
+  getGaussianRandomNumber = () => {
+    let u = 0,
+      v = 0;
+    while (u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while (v === 0) v = Math.random();
+    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    num = num / 10.0 + 0.5; // Translate to 0 -> 1
+    if (num > 1 || num < 0) return this.getGaussianRandomNumber(); // resample between 0 and 1
+    return num;
+  };
+
+  generateRandomPoints = () => {
+    let count = 100;
+    let noise = 0.3;
+    let theta = (Math.tanh(this.state.m) * 180) / Math.PI;
+    let perpendicularIntercept = 0;
+    let randomPointsMap = [];
+    let noiseMap = [];
+    for (let i = 0; i < 100; i++) {
+      let randomNumber = this.getGaussianRandomNumber();
+      randomPointsMap.push({
+        x: randomNumber,
+        y: this.state.m * randomNumber + this.intercept
+      });
+    }
+    console.log(randomPointsMap);
+    // mapping for noise
+    for (let i = 0; i < 100; i++) {
+      noiseMap.push(this.getGaussianRandomNumber() / (noise * noise));
+    }
+    console.log("noiseMap", noiseMap);
+
+    // calculate perpendicular line intercept
+    perpendicularIntercept =
+      randomPointsMap[0].y + randomPointsMap[0].x / this.state.m;
+
+    // logic for geneeration of random data points by solving equation of circle and perpendicular line
+    for (let i = 0; i < 100; i++) {
+      let point1 = {
+        x:
+          randomPointsMap[i].x -
+          noiseMap[i] * Math.sin((theta * Math.PI) / 180),
+        y:
+          randomPointsMap[i].y + noiseMap[i] * Math.cos((theta * Math.PI) / 180)
+      };
+      let point2 = {
+        x:
+          randomPointsMap[i].x +
+          noiseMap[i] * Math.sin((theta * Math.PI) / 180),
+        y: Math.abs(
+          randomPointsMap[i].y - noiseMap[i] * Math.cos((theta * Math.PI) / 180)
+        )
+      };
+
+      if (noiseMap[i] < 0) {
+        this.state.dataPoints.push(point1);
+      } else {
+        this.state.dataPoints.push(point2);
+      }
+    }
+    this.setState({
+      dataPoints: this.state.dataPoints
     });
   };
 
@@ -114,7 +176,7 @@ export default class LinearRegression extends React.Component {
                 parent: { border: "1px solid #ccc" }
               }}
               name="scatter"
-              data={data_points}
+              data={this.state.dataPoints}
               width={50}
               height={50}
             />
@@ -134,7 +196,7 @@ export default class LinearRegression extends React.Component {
           </button>
         </div>
         <div>
-          <DataPointsTable datapoints={data_points} />
+          <DataPointsTable datapoints={[]} />
         </div>
         <div>
           <RegressionStatistics
