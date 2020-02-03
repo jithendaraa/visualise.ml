@@ -14,6 +14,7 @@ const DataPointsTable = ({ datapoints }) => {
 
       <div />
       <table class="table table-responsive">
+
         <thead class="thead-dark">
           <tr>
             <th scope="col">SNO</th>

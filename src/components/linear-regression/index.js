@@ -9,13 +9,13 @@ import RegressionStatistics from "../regression-statistics/index";
 import DataPointsTable from "../data-points-table/index";
 import "./index.css";
 
-// const data_points = [
-//   { x: 1, y: 1 },
-//   { x: 2, y: 2 },
-//   { x: 3, y: 1 },
-//   { x: 4, y: 3 },
-//   { x: 5, y: 2 }
-// ];
+const data_points = [
+  { x: 1, y: 1 },
+  { x: 2, y: 2 },
+  { x: 3, y: 1 },
+  { x: 4, y: 3 },
+  { x: 5, y: 2 }
+];
 
 export default class LinearRegression extends React.Component {
   constructor() {
@@ -23,7 +23,7 @@ export default class LinearRegression extends React.Component {
     this.intercept = 0;
     this.iterations = 0;
     this.state = {
-      m: 1,
+      m: 0.64,
       learningRate: 0.001,
       lineDataPoints: [],
       dataPoints: []
@@ -49,25 +49,17 @@ export default class LinearRegression extends React.Component {
       newIntercept = this.intercept - step_size;
       console.log("new intercept", newIntercept);
       console.log("old interncept", this.intercept);
-      console.log("abs difference", newIntercept - this.intercept);
+
+      console.log("abs difference", Math.abs(newIntercept - this.intercept));
       count++;
       this.iterations = count;
-      // this.setState(
-      //   {
-      //     intercept: newIntercept
-      //   },
-      //   () => {
-      //     console.log('new intercept state after updTE', this.intercept);
-      //     this.drawLine();
-      //   }
-      // );
-      // if (newIntercept - this.intercept >= 0) {
-      //   console.log("breaking...");
-      //   break;
-      // }
+      if (Math.abs(newIntercept - this.intercept) <= 0.0001) {
+        console.log("breaking...");
+        break;
+      }
       this.intercept = newIntercept;
       this.drawLine();
-    } while (count !== 200);
+    } while (true);
   };
 
   drawLine = () => {
@@ -102,6 +94,7 @@ export default class LinearRegression extends React.Component {
     let randomPointsMap = [];
     let noiseMap = [];
     for (let i = 0; i < count; i++) {
+
       let randomNumber = this.getGaussianRandomNumber();
       randomPointsMap.push({
         x: randomNumber,
@@ -128,6 +121,7 @@ export default class LinearRegression extends React.Component {
       let point2 = {
         x: randomPointsMap[i].x + noiseMap[i] * Math.sin(theta),
         y: Math.abs(randomPointsMap[i].y - noiseMap[i] * Math.cos(theta))
+
       };
 
       if (noiseMap[i] < 0) {
@@ -154,6 +148,7 @@ export default class LinearRegression extends React.Component {
               className="input input-control"
               value={this.state.learningRate}
               onChange={e => this.setState({ learningRate: e.target.value })}
+
             />
             <VictoryChart
               // domain={{x: [0, 20], y: [0, 20]}}
@@ -207,6 +202,23 @@ export default class LinearRegression extends React.Component {
               intercept={this.intercept}
             />
           </div>
+          </VictoryChart>
+          <button
+            onClick={this.applyLinearRegression}
+            className="btn btn-success"
+          >
+            apply LinearRegression
+          </button>
+        </div>
+        <div>
+          <DataPointsTable datapoints={[]} />
+        </div>
+        <div>
+          <RegressionStatistics
+            iterations={this.iterations}
+            slope={this.state.m}
+            intercept={this.intercept}
+          />
         </div>
       </div>
     );
