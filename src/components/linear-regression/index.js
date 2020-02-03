@@ -9,13 +9,14 @@ import RegressionStatistics from "../regression-statistics/index";
 import DataPointsTable from "../data-points-table/index";
 import "./index.css";
 
-// const data_points = [
-//   { x: 1, y: 1 },
-//   { x: 2, y: 2 },
-//   { x: 3, y: 1 },
-//   { x: 4, y: 3 },
-//   { x: 5, y: 2 }
-// ];
+
+const data_points = [
+  { x: 1, y: 1 },
+  { x: 2, y: 2 },
+  { x: 3, y: 1 },
+  { x: 4, y: 3 },
+  { x: 5, y: 2 }
+];
 
 export default class LinearRegression extends React.Component {
   constructor() {
@@ -23,7 +24,7 @@ export default class LinearRegression extends React.Component {
     this.intercept = 0;
     this.iterations = 0;
     this.state = {
-      m: 1,
+      m: 0.64,
       learningRate: 0.001,
       lineDataPoints: [],
       dataPoints: []
@@ -52,15 +53,6 @@ export default class LinearRegression extends React.Component {
       console.log("abs difference", Math.abs(newIntercept - this.intercept));
       count++;
       this.iterations = count;
-      // this.setState(
-      //   {
-      //     intercept: newIntercept
-      //   },
-      //   () => {
-      //     console.log('new intercept state after updTE', this.intercept);
-      //     this.drawLine();
-      //   }
-      // );
       if (Math.abs(newIntercept - this.intercept) <= 0.0001) {
         console.log("breaking...");
         break;
