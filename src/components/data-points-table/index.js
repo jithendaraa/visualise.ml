@@ -3,10 +3,18 @@ import "./index.css";
 
 const DataPointsTable = ({ datapoints }) => {
   return (
-    <div style={{ width: "650px" }}>
-      <h1>Regression Statistics </h1>
+    <div style={{ width: "445px" }}>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page">
+            Data Points
+          </li>
+        </ol>
+      </nav>
+
       <div />
-      <table class="table">
+      <table class="table table-responsive">
+
         <thead class="thead-dark">
           <tr>
             <th scope="col">SNO</th>
